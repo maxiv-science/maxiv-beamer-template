@@ -1,0 +1,124 @@
+\RequirePackage{tikz, datetime, epstopdf}
+\RequirePackage[absolute, overlay]{textpos}
+\usetikzlibrary{calc}
+
+% place a grid there if that option was specified
+\newif\if@doGrid
+\@doGridfalse
+\DeclareOption{grid}{\@doGridtrue}
+\ProcessOptions
+\if@doGrid
+    \usepackage[texcoord,grid,gridunit=mm,gridcolor=red!20,subgridcolor=green!40]
+{eso-pic}
+\fi
+
+% define some colours
+\definecolor{MaxivGreen}{RGB}{132,189,0}
+\definecolor{MaxivOrange}{RGB}{248,179,34}
+\definecolor{MaxivGray}{RGB}{153,153,154}
+\definecolor{MaxivLightGray}{RGB}{235,235,235}
+\definecolor{MaxivDarkGray}{RGB}{110,110,110}
+
+\setbeamercolor*{title page header}{fg=white}
+\setbeamercolor*{title}{fg=MaxivGreen}
+\setbeamercolor*{author}{fg=black}
+\setbeamercolor*{date}{fg=white}
+\setbeamercolor*{item}{fg=MaxivOrange}
+\setbeamercolor*{frametitle}{fg=MaxivDarkGray}
+\setbeamercolor*{block title}{fg=white, bg=MaxivOrange}
+\setbeamercolor*{block title example}{fg=white, bg=MaxivOrange}
+\setbeamercolor*{block body}{bg=MaxivLightGray}
+\setbeamercolor*{block body example}{bg=MaxivLightGray}
+\setbeamercolor*{section in toc}{fg=MaxivDarkGray}
+\setbeamercolor*{section page}{fg=MaxivDarkGray}
+
+\setbeamerfont{section page}{size=\LARGE}
+\setbeamerfont{title}{size=\LARGE}
+\setbeamerfont{author}{size=\Large}
+\setbeamerfont{date}{size=\Large}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{items}[square]
+\setbeamertemplate{itemize item}{\tikz{\draw[color=MaxivOrange, semithick] rectangle(.2,.2);}}
+\setbeamertemplate{itemize subitem}{\tikz{\draw[color=MaxivGray, ultra thick] rectangle(.2,.2);}}
+\setbeamertemplate{sections/subsections in toc}[square]
+
+\newenvironment{xplainframe}{\bgroup\setbeamertemplate{background}{}\begin{frame}[plain]}{\end{frame}\egroup}
+
+\setbeamertemplate{background}{
+    \begin{tikzpicture}[x=1mm, y=1mm]
+        \useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+        \ifnum\thepage>1\relax% Not the title page
+            % orange and grey fields relative to the top left
+            \node[inner sep=0pt] (ul) at (current bounding box.north west) {};
+            \fill[color=MaxivOrange] ($(ul)+(0,-16)$) rectangle ($(ul)+(8,-13)$);
+            \fill[color=MaxivLightGray] ($(ul)+(9,-16)$) rectangle ($(ul)+(\beamer@paperwidth,-13)$);
+            %	        \fill[color=MaxivOrange] (0,80) rectangle(8,83);
+            %	        \fill[color=MaxivLightGray] (9,80) rectangle(\the\paperwidth, 83);
+            \node[inner sep=0pt] (lr) at (current bounding box.south east) {};
+            \node[inner sep=0pt, anchor=south east] (logo) at ($(lr)-(2,0)$) {\includegraphics[width=.12\textwidth]{logo_col}};
+        \else% Title page
+            % the whole thing is a lovely green
+            \fill[color=MaxivGreen] (0,0) rectangle (\the\paperwidth, \the\paperheight);
+            % the rings relative to the top right
+            \node[inner sep=0pt, anchor=north east] (rings) at ($(current bounding box.north east)+(.15\beamer@paperheight,0)$) {\includegraphics[height=.3\beamer@paperheight]{rings}};
+            % white logo relative to the bottom right corner
+            \node[inner sep=0pt] (lr) at (current bounding box.south east) {};
+            \node[inner sep=0pt, anchor=south east] (logo) at ($(lr)-(2,0)$) {\includegraphics[width=.12\textwidth]{logo_neg}};
+        \fi
+    \end{tikzpicture}
+}
+
+\setbeamertemplate{title page}{
+    \begin{textblock*}{.7\beamer@paperwidth}(.15\beamer@paperwidth,.4\beamer@paperheight)
+        \begin{beamercolorbox}[]{title page header}
+            \centering
+            \usebeamerfont{title}\usebeamercolor{title}\inserttitle%
+            \\ \vspace{1em}
+            \usebeamerfont{author}\insertauthor%
+            \\ \vspace{1em}
+            \usebeamerfont{date}\insertdate%
+        \end{beamercolorbox}%
+    \end{textblock*}
+}
+
+\newcommand{\sectionframe}{{
+    \setbeamertemplate{background}{
+    \begin{tikzpicture}[x=1mm, y=1mm]
+        \useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+        % orange blob relative to top left corner
+        \node[inner sep=0pt] (ul) at (current bounding box.north west) {};
+        \fill[color=MaxivOrange] ($(ul)+(0,-25)$) rectangle ($(ul)+(15,-35)$);
+        % logo relative to the lower right corner
+        \node[inner sep=0pt] (lr) at (current bounding box.south east) {};
+        \node[inner sep=0pt, anchor=south east] (logo) at ($(lr)-(2,0)$) {\includegraphics[width=.12\textwidth]{logo_col}};
+    \end{tikzpicture}
+    }
+    \frame{\sectionpage}
+}}
+
+\setbeamertemplate{section page}{
+    % section title's first line in line with the orange blob
+    \begin{textblock*}{.8\beamer@paperwidth}(20mm,28mm)
+        \begin{beamercolorbox}{section page}
+            \insertsectionhead
+        \end{beamercolorbox}
+    \end{textblock*}
+}
+
+\setbeamertemplate{frametitle}{
+    \vspace{0.3cm}
+    \begin{beamercolorbox}{frametitle}
+        \insertframetitle
+    \end{beamercolorbox}
+}
+
+\newcommand{\logoframe}{{
+    \setbeamertemplate{background}{
+        \begin{tikzpicture}
+            \useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+            \node[inner sep=0pt, anchor=center] (logo) at (current bounding box.center) {\includegraphics[width=.8\textwidth]{logo_big}};
+        \end{tikzpicture}
+    }
+    \frame{}
+}}
